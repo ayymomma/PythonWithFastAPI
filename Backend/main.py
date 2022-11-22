@@ -1,8 +1,6 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
 
-from Auth.AuthHandler import AuthHandler
-from Controller.User import auth_handler, user
+from Controller.UserController import user
 
 app = FastAPI()
 app.include_router(user, prefix="/api")

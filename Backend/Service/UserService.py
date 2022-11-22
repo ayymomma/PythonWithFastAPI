@@ -1,10 +1,12 @@
-from fastapi import Depends, APIRouter
+from fastapi import Depends
 from sqlalchemy.orm import Session
+
 from Auth.AuthHandler import AuthHandler
-from DDO.UserDDO import UserDDO, UserRegisterDDO, UserLoginDDO
-from DataBase.Database import engine, SessionLocal
+from DDO.UserDDO import UserRegisterDDO, UserLoginDDO
+from DataBase.Database import SessionLocal
 import DataBase.Models as models
 
+from DataBase.Database import engine
 models.Base.metadata.create_all(bind=engine)
 auth_handler = AuthHandler()
 
@@ -17,10 +19,6 @@ def get_db():
         db.close()
 
 
-user = APIRouter()
-
-
-# User
 def username_exists(username: str, db: Session = Depends(get_db)):
     return db.query(models.User).filter(models.User.username == username).first() is not None
 
@@ -30,9 +28,7 @@ def email_exists(email: str, user_id: int, db: Session = Depends(get_db)):
                .filter(models.User.user_id != user_id).first() is not None
 
 
-# register a new user
-@user.post("/register", status_code=201)
-def register(user_register: UserRegisterDDO, db: Session = Depends(get_db)):
+def create_user(user_register: UserRegisterDDO, db: Session = Depends(get_db)):
     if username_exists(user_register.username, db):
         return {"message": "Username already exists"}
     if email_exists(user_register.email, user_register.user_id, db):
@@ -46,13 +42,9 @@ def register(user_register: UserRegisterDDO, db: Session = Depends(get_db)):
     return {"message": "User created"}
 
 
-# login
-@user.post("/login")
 def login(user_login: UserLoginDDO, db: Session = Depends(get_db)):
     user_model = db.query(models.User).filter(models.User.username == user_login.username).first()
     if not user_model or not auth_handler.verify_password(user_login.password, user_model.password):
         return {"message": "Invalid credentials"}
-
     token = auth_handler.encode_token(user_model.user_id)
     return {"token": token}
-
