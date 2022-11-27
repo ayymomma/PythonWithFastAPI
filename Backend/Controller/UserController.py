@@ -1,10 +1,5 @@
 from fastapi import Depends, APIRouter
-from sqlalchemy.orm import Session
-
-import DataBase.Models as models
-from Auth.AuthHandler import AuthHandler
-from DDO.UserDDO import UserRegisterDDO, UserLoginDDO
-from Service.UserService import get_db, username_exists, email_exists, create_user, login
+from Service.UserService import create_user, login
 
 user = APIRouter()
 
