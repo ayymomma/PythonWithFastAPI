@@ -1,7 +1,7 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from DDO.PersonDDO import PersonSearchCNPDDO, PersonAddDDO
+from DDO.PersonDDO import PersonAddDDO
 from DataBase.Database import SessionLocal
 import DataBase.Models as models
 from Service.UserService import auth_handler
@@ -35,6 +35,19 @@ def create_person(person_add: PersonAddDDO, db: Session = Depends(get_db),
 def get_person_by_cnp(cnp: str, db: Session = Depends(get_db),
                       user_id: int = Depends(auth_handler.auth_wrapper)):
     person_model = db.query(models.Person).filter(models.Person.cnp == cnp).first()
+    if not person_model:
+        return {"message": "Person not found"}
+    return person_model
+
+
+def get_person_by_name(first_name: str, last_name: str = "", db: Session = Depends(get_db),
+                       user_id: int = Depends(auth_handler.auth_wrapper)):
+    if last_name == "":
+        person_model = db.query(models.Person).filter(models.Person.first_name == first_name).all()
+    else:
+        person_model = db.query(models.Person).filter(models.Person.first_name == first_name) \
+            .filter(models.Person.last_name == last_name).all()
+
     if not person_model:
         return {"message": "Person not found"}
     return person_model
