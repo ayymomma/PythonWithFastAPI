@@ -14,7 +14,9 @@ class PersonAddDDO(BaseModel):
 class PersonSearchDDO(BaseModel):
     first_name: str
     last_name: str
+    user_id: int
 
 
 class PersonSearchCNPDDO(BaseModel):
     cnp: str
+    user_id: int
