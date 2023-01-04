@@ -32,7 +32,7 @@ def create_person(person_add: PersonAddDDO, db: Session = Depends(get_db),
 
 def get_person_by_cnp(cnp: str, db: Session = Depends(get_db),
                       user_id: int = Depends(auth_handler.auth_wrapper)):
-    person_model = db.query(models.Person).filter(models.Person.user_id == user_id)\
+    person_model = db.query(models.Person).filter(models.Person.user_id == user_id) \
         .filter(models.Person.cnp == cnp).first()
     if not person_model:
         return {"message": "Person not found"}
@@ -42,13 +42,22 @@ def get_person_by_cnp(cnp: str, db: Session = Depends(get_db),
 def get_person_by_name(first_name: str, last_name: str | None = None, db: Session = Depends(get_db),
                        user_id: int = Depends(auth_handler.auth_wrapper)):
     if last_name is None:
-        person_model = db.query(models.Person).filter(models.Person.user_id == user_id)\
+        person_model = db.query(models.Person).filter(models.Person.user_id == user_id) \
             .filter(models.Person.first_name == first_name).all()
     else:
-        person_model = db.query(models.Person).filter(models.Person.user_id == user_id)\
+        person_model = db.query(models.Person).filter(models.Person.user_id == user_id) \
             .filter(models.Person.first_name == first_name) \
             .filter(models.Person.last_name == last_name).all()
 
+    if not person_model:
+        return {"message": "Person not found"}
+    return person_model
+
+
+def get_person_by_page(page: int, no_per_page: int, db: Session = Depends(get_db),
+                       user_id: int = Depends(auth_handler.auth_wrapper)):
+    person_model = db.query(models.Person).filter(models.Person.user_id == user_id) \
+        .offset(page * no_per_page).limit(no_per_page).all()
     if not person_model:
         return {"message": "Person not found"}
     return person_model
