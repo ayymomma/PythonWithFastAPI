@@ -20,3 +20,5 @@ class PersonSearchDDO(BaseModel):
 class PersonSearchCNPDDO(BaseModel):
     cnp: str
     user_id: int
+
+

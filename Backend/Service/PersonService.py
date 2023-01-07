@@ -2,6 +2,7 @@ from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from DDO.PersonDDO import PersonAddDDO
+from DDO.ReceiptDDO import ReceiptAddDDO
 from DataBase.Database import SessionLocal
 import DataBase.Models as models
 from Service.UserService import auth_handler
@@ -61,3 +62,15 @@ def get_person_by_page(page: int, no_per_page: int, db: Session = Depends(get_db
     if not person_model:
         return {"message": "Person not found"}
     return person_model
+
+
+def add_receipt(receipt: ReceiptAddDDO, db: Session = Depends(get_db),
+                user_id: int = Depends(auth_handler.auth_wrapper)):
+    receipt_model = models.Receipt(name=receipt.name,
+                                   date=receipt.date,
+                                   amount=receipt.amount,
+                                   person_id=receipt.person_id)
+    db.add(receipt_model)
+    db.commit()
+    db.refresh(receipt_model)
+    return {"message": "Receipt added"}

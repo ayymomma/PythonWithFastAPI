@@ -1,5 +1,5 @@
 from fastapi import Depends, APIRouter
-from Service.PersonService import create_person, get_person_by_cnp, get_person_by_name, get_person_by_page
+from Service.PersonService import create_person, get_person_by_cnp, get_person_by_name, get_person_by_page, add_receipt
 
 person = APIRouter()
 
@@ -21,4 +21,9 @@ def get_person(return_value: dict = Depends(get_person_by_name)):
 
 @person.get("/get/{page}/{no_per_page}")
 def get_person(return_value: dict = Depends(get_person_by_page)):
+    return return_value
+
+
+@person.post("/add_receipt")
+def add_receipt(return_value: dict = Depends(add_receipt)):
     return return_value

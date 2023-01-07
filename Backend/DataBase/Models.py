@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime
 from DataBase.Database import Base
 
 
@@ -18,8 +18,17 @@ class Person(Base):
     phone = Column(String)
     area = Column(Float)
     quantity = Column(Integer)
-    cnp = Column(String, unique=True, index=True)
+    cnp = Column(String, index=True)
     user_id = Column(Integer, ForeignKey("user.user_id"))
+
+
+class Receipt(Base):
+    __tablename__ = "receipt"
+    receipt_id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    date = Column(DateTime)
+    amount = Column(Integer)
+    person_id = Column(Integer, ForeignKey("person.person_id"))
 
 
 class Document(Base):
