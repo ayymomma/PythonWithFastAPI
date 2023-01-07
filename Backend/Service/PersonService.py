@@ -1,4 +1,5 @@
 from fastapi import Depends
+from sqlalchemy import extract
 from sqlalchemy.orm import Session
 
 from DDO.PersonDDO import PersonAddDDO
@@ -74,3 +75,12 @@ def add_receipt(receipt: ReceiptAddDDO, db: Session = Depends(get_db),
     db.commit()
     db.refresh(receipt_model)
     return {"message": "Receipt added"}
+
+
+def get_receipt_by_person_id_and_year(person_id: int, year: int, db: Session = Depends(get_db),
+                                      user_id: int = Depends(auth_handler.auth_wrapper)):
+    receipt_model = db.query(models.Receipt).filter(models.Receipt.person_id == person_id) \
+        .filter(extract("year", models.Receipt.date) == year).all()
+    if not receipt_model:
+        return {"message": "Receipt not found"}
+    return receipt_model
