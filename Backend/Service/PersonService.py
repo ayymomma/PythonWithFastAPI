@@ -85,3 +85,9 @@ def get_receipt_by_person_id_and_year(person_id: int, year: int, db: Session = D
         return {"message": "Receipt not found"}
     return receipt_model
 
+
+def get_number_of_pages(no_per_page: int, db: Session = Depends(get_db),
+                        user_id: int = Depends(auth_handler.auth_wrapper)):
+    person_model = db.query(models.Person).filter(models.Person.user_id == user_id).all()
+    # round at next integer
+    return {"pages": -(-len(person_model) // no_per_page)}
