@@ -82,7 +82,7 @@ def get_receipt_by_person_id_and_year(person_id: int, year: int, db: Session = D
     receipt_model = db.query(models.Receipt).filter(models.Receipt.person_id == person_id) \
         .filter(extract("year", models.Receipt.date) == year).all()
     if not receipt_model:
-        return {"message": "Receipt not found"}
+        return []
     return receipt_model
 
 
