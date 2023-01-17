@@ -31,6 +31,7 @@ def create_person(person_add: PersonAddDDO, db: Session = Depends(get_db),
 
     stats_model = db.query(models.Stats).filter(models.Stats.user_id == user_id).first()
     stats_model.persons += 1
+    stats_model.amount += person_add.area
     db.add(stats_model)
     db.add(person_model)
     db.commit()
@@ -112,6 +113,11 @@ def delete_person_by_id(person_id: int, db: Session = Depends(get_db),
     receipt_model = db.query(models.Receipt).filter(models.Receipt.person_id == person_id).all()
     for receipt in receipt_model:
         db.delete(receipt)
+    db.commit()
+    stats_model = db.query(models.Stats).filter(models.Stats.user_id == user_id).first()
+    stats_model.persons -= 1
+    stats_model.amount -= person_model.area
+    db.add(stats_model)
     db.commit()
     return {"message": "Person deleted"}
 
