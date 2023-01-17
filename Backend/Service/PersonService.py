@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import Depends
 from sqlalchemy import extract
 from sqlalchemy.orm import Session
@@ -26,6 +28,14 @@ def create_person(person_add: PersonAddDDO, db: Session = Depends(get_db),
                                  quantity=person_add.quantity,
                                  cnp=person_add.cnp,
                                  user_id=user_id)
+    try:
+        stats_model = db.query(models.Stats).filter(models.Stats.user_id == user_id).first()
+    except Exception as e:
+        print(e)
+        stats_model = models.Stats(user_id=user_id, persons=0, amount=0)
+
+    stats_model.persons += 1
+    db.add(stats_model)
     db.add(person_model)
     db.commit()
     db.refresh(person_model)
@@ -71,6 +81,8 @@ def add_receipt(receipt: ReceiptAddDDO, db: Session = Depends(get_db),
                                    date=receipt.date,
                                    amount=receipt.amount,
                                    person_id=receipt.person_id)
+    stats_model = db.query(models.Stats).filter(models.Stats.user_id == user_id).first()
+    stats_model.amount += receipt.amount
     db.add(receipt_model)
     db.commit()
     db.refresh(receipt_model)
@@ -113,3 +125,21 @@ def get_all_area(db: Session = Depends(get_db),
     for person in person_model:
         area += person.area
     return {"area": round(area, 2)}
+
+
+def get_all_receipts_amount(db: Session = Depends(get_db),
+                            user_id: int = Depends(auth_handler.auth_wrapper)):
+    receipt_model = db.query(models.Receipt).filter(models.Receipt.person_id.in_(
+        db.query(models.Person.person_id).filter(models.Person.user_id == user_id))) \
+        .filter(extract("year", models.Receipt.date) == datetime.now().year).all()
+    if not receipt_model:
+        return {"message": "Receipt not found"}
+    amount = 0
+    for receipt in receipt_model:
+        amount += receipt.amount
+    return {"amount": round(amount, 2)}
+
+
+def get_persons_number(db: Session = Depends(get_db),
+                       user_id: int = Depends(auth_handler.auth_wrapper)):
+    pass

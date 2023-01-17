@@ -1,6 +1,6 @@
 from fastapi import Depends, APIRouter
 from Service.PersonService import create_person, get_person_by_cnp, get_person_by_name, get_person_by_page, add_receipt, \
-    get_receipt_by_person_id_and_year, get_number_of_pages, delete_person_by_id, get_all_area
+    get_receipt_by_person_id_and_year, get_number_of_pages, delete_person_by_id, get_all_area, get_all_receipts_amount
 
 person = APIRouter()
 
@@ -47,4 +47,14 @@ def delete_person(return_value: dict = Depends(delete_person_by_id)):
 
 @person.get("/get_all_area")
 def get_all_area(return_value: dict = Depends(get_all_area)):
+    return return_value
+
+
+@person.get("/get_receipt_value")
+def get_receipt_value(return_value: dict = Depends(get_all_receipts_amount)):
+    return return_value
+
+
+@person.get("/get_persons_number")
+def get_persons_number(return_value: dict = Depends(get_number_of_pages)):
     return return_value

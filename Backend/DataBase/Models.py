@@ -38,3 +38,12 @@ class Document(Base):
     document_code = Column(String, unique=True)
     type = Column(String)
     expire_year = Column(Integer)
+
+
+class Stats(Base):
+    __tablename__ = "stats"
+    stats_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user.user_id"))
+    year = Column(Integer)
+    amount = Column(Integer)
+    persons = Column(Integer)
