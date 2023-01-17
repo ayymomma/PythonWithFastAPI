@@ -113,6 +113,10 @@ def delete_person_by_id(person_id: int, db: Session = Depends(get_db),
         return {"message": "Person not found"}
     db.delete(person_model)
     db.commit()
+    receipt_model = db.query(models.Receipt).filter(models.Receipt.person_id == person_id).all()
+    for receipt in receipt_model:
+        db.delete(receipt)
+    db.commit()
     return {"message": "Person deleted"}
 
 
