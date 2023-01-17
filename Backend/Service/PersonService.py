@@ -102,3 +102,14 @@ def delete_person_by_id(person_id: int, db: Session = Depends(get_db),
     db.delete(person_model)
     db.commit()
     return {"message": "Person deleted"}
+
+
+def get_all_area(db: Session = Depends(get_db),
+                 user_id: int = Depends(auth_handler.auth_wrapper)):
+    person_model = db.query(models.Person).filter(models.Person.user_id == user_id).all()
+    if not person_model:
+        return {"message": "Person not found"}
+    area = 0
+    for person in person_model:
+        area += person.area
+    return {"area": round(area, 2)}
