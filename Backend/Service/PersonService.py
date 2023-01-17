@@ -87,8 +87,8 @@ def add_receipt(receipt: ReceiptAddDDO, db: Session = Depends(get_db),
                                    date=receipt.date,
                                    amount=receipt.amount,
                                    person_id=receipt.person_id)
-    stats_model = db.query(models.Stats).filter(models.Stats.user_id == user_id).first()
-    stats_model.amount += receipt.amount
+    # stats_model = db.query(models.Stats).filter(models.Stats.user_id == user_id).first()
+    # stats_model.amount += receipt.amount
 
     log_model = models.Log(user_id=user_id,
                            date=datetime.now(),
@@ -97,7 +97,7 @@ def add_receipt(receipt: ReceiptAddDDO, db: Session = Depends(get_db),
 
     db.add(log_model)
     db.add(receipt_model)
-    db.add(stats_model)
+    # db.add(stats_model)
     db.commit()
     return {"message": "Receipt added"}
 
