@@ -50,8 +50,15 @@ def login(user_login: UserLoginDDO, db: Session = Depends(get_db)):
     return {"token": token}
 
 
-def get_logs(user_id: int = Depends(auth_handler.auth_wrapper), db: Session = Depends(get_db)):
-    log_model = db.query(models.Log).filter(models.Log.user_id == user_id).all()
+def get_logs(page: int, no_per_page: int, user_id: int = Depends(auth_handler.auth_wrapper), db: Session = Depends(get_db)):
+    log_model = db.query(models.Log).filter(models.Log.user_id == user_id) \
+        .offset(page * no_per_page).limit(no_per_page).all()
     if not log_model:
         return []
     return log_model
+
+
+def get_logs_pages(no_per_page: int, db: Session = Depends(get_db),
+                   user_id: int = Depends(auth_handler.auth_wrapper)):
+    log_model = db.query(models.Log).filter(models.Log.user_id == user_id).all()
+    return {"pages": -(-len(log_model) // no_per_page)}
