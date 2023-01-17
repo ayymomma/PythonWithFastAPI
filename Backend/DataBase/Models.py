@@ -47,3 +47,11 @@ class Stats(Base):
     year = Column(Integer)
     amount = Column(Integer)
     persons = Column(Integer)
+
+
+class Log(Base):
+    __tablename__ = "log"
+    log_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("user.user_id"))
+    date = Column(DateTime)
+    message = Column(String)

@@ -48,3 +48,10 @@ def login(user_login: UserLoginDDO, db: Session = Depends(get_db)):
         return {"message": "Invalid credentials"}
     token = auth_handler.encode_token(user_model.user_id)
     return {"token": token}
+
+
+def get_logs(user_id: int = Depends(auth_handler.auth_wrapper), db: Session = Depends(get_db)):
+    log_model = db.query(models.Log).filter(models.Log.user_id == user_id).all()
+    if not log_model:
+        return []
+    return log_model

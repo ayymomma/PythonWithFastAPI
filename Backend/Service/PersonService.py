@@ -32,10 +32,19 @@ def create_person(person_add: PersonAddDDO, db: Session = Depends(get_db),
     stats_model = db.query(models.Stats).filter(models.Stats.user_id == user_id).first()
     stats_model.persons += 1
     stats_model.amount += person_add.area
-    db.add(stats_model)
+
+    log_model = models.Log(user_id=user_id,
+                           date=datetime.now(),
+                           message=f"Added a new person with name {person_model.first_name} {person_model.last_name}"
+                                   f" and area {person_model.area}")
+
+    db.add(log_model)
     db.add(person_model)
+    db.add(stats_model)
     db.commit()
     db.refresh(person_model)
+    db.refresh(stats_model)
+    db.refresh(log_model)
     return {"message": "Person created"}
 
 
@@ -80,9 +89,16 @@ def add_receipt(receipt: ReceiptAddDDO, db: Session = Depends(get_db),
                                    person_id=receipt.person_id)
     stats_model = db.query(models.Stats).filter(models.Stats.user_id == user_id).first()
     stats_model.amount += receipt.amount
+
+    log_model = models.Log(user_id=user_id,
+                           date=datetime.now(),
+                           message=f"Added a new receipt with name {receipt_model.name} "
+                                   f"and amount {receipt_model.amount}")
+
+    db.add(log_model)
     db.add(receipt_model)
+    db.add(stats_model)
     db.commit()
-    db.refresh(receipt_model)
     return {"message": "Receipt added"}
 
 
@@ -118,6 +134,13 @@ def delete_person_by_id(person_id: int, db: Session = Depends(get_db),
     stats_model.persons -= 1
     stats_model.amount -= person_model.area
     db.add(stats_model)
+
+    log_model = models.Log(user_id=user_id,
+                           date=datetime.now(),
+                           message=f"Deleted a person with name {person_model.first_name} {person_model.last_name} "
+                                   f"and area {person_model.area} and cnp {person_model.cnp}")
+
+    db.add(log_model)
     db.commit()
     return {"message": "Person deleted"}
 
