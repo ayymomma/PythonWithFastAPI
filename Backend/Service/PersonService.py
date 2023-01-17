@@ -28,12 +28,8 @@ def create_person(person_add: PersonAddDDO, db: Session = Depends(get_db),
                                  quantity=person_add.quantity,
                                  cnp=person_add.cnp,
                                  user_id=user_id)
-    try:
-        stats_model = db.query(models.Stats).filter(models.Stats.user_id == user_id).first()
-    except Exception as e:
-        print(e)
-        stats_model = models.Stats(user_id=user_id, persons=0, amount=0)
 
+    stats_model = db.query(models.Stats).filter(models.Stats.user_id == user_id).first()
     stats_model.persons += 1
     db.add(stats_model)
     db.add(person_model)
@@ -144,6 +140,9 @@ def get_all_receipts_amount(db: Session = Depends(get_db),
     return {"amount": round(amount, 2)}
 
 
-def get_persons_number(db: Session = Depends(get_db),
-                       user_id: int = Depends(auth_handler.auth_wrapper)):
-    pass
+def get_persons_and_amount(db: Session = Depends(get_db),
+                           user_id: int = Depends(auth_handler.auth_wrapper)):
+    stats = db.query(models.Stats).filter(models.Stats.user_id == user_id).first()
+    if not stats:
+        return {"persons": 0, "amount": 0}
+    return {"persons": stats.persons, "amount": round(stats.amount, 2)}
