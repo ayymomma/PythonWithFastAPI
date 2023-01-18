@@ -183,6 +183,13 @@ def edit_person(person_edit: PersonAddDDO, db: Session = Depends(get_db),
     person_to_edit = db.query(models.Person).filter(models.Person.user_id == user_id)\
         .filter(models.Person.person_id == person_edit.person_id).first()
 
+    log_model = models.Log(user_id=user_id,
+                           date=datetime.now(),
+                           message=f"Edited a person with name {person_edit.first_name} {person_edit.last_name} "
+                                   f"and area {person_edit.area} and cnp {person_edit.cnp}")
+
+    db.add(log_model)
+
     if person_to_edit:
         person_to_edit.area = person_edit.area
         person_to_edit.quantity = person_edit.quantity
