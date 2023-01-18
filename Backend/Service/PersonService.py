@@ -176,3 +176,21 @@ def get_persons_and_amount(db: Session = Depends(get_db),
     if not stats:
         return {"persons": 0, "amount": 0}
     return {"persons": stats.persons, "amount": round(stats.amount, 2)}
+
+
+def edit_person(person_edit: PersonAddDDO, db: Session = Depends(get_db),
+                user_id: int = Depends(auth_handler.auth_wrapper)):
+    person_to_edit = db.query(models.Person).filter(models.Person.user_id == user_id)\
+        .filter(models.Person.person_id == person_edit.person_id).first()
+
+    if person_to_edit:
+        person_to_edit.area = person_edit.area
+        person_to_edit.quantity = person_edit.quantity
+        person_to_edit.cnp  = person_edit.cnp
+        person_to_edit.first_name = person_edit.first_name
+        person_to_edit.last_name = person_edit.last_name
+        db.add(person_to_edit)
+        db.commit()
+        db.refresh(person_to_edit)
+        return {"message": "success"}
+    return {"message": "person not found"}
