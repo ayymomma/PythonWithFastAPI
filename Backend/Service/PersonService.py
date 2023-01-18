@@ -74,7 +74,8 @@ def get_person_by_name(first_name: str, last_name: str | None = None, db: Sessio
 
 def get_person_by_page(page: int, no_per_page: int, db: Session = Depends(get_db),
                        user_id: int = Depends(auth_handler.auth_wrapper)):
-    person_model = db.query(models.Person).filter(models.Person.user_id == user_id) \
+    person_model = db.query(models.Person).filter(models.Person.user_id == user_id)\
+        .order_by(models.Person.first_name.asc()).order_by(models.Person.last_name.asc()) \
         .offset(page * no_per_page).limit(no_per_page).all()
     if not person_model:
         return {"message": "Person not found"}
