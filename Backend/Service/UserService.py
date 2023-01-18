@@ -51,7 +51,7 @@ def login(user_login: UserLoginDDO, db: Session = Depends(get_db)):
 
 
 def get_logs(page: int, no_per_page: int, user_id: int = Depends(auth_handler.auth_wrapper), db: Session = Depends(get_db)):
-    log_model = db.query(models.Log).filter(models.Log.user_id == user_id) \
+    log_model = db.query(models.Log).filter(models.Log.user_id == user_id).order_by(models.Log.date.desc()) \
         .offset(page * no_per_page).limit(no_per_page).all()
     if not log_model:
         return []
